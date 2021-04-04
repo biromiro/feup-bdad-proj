@@ -42,7 +42,7 @@ CREATE TABLE county (
 CREATE TABLE zip_code (
     id INTEGER,
     zip_code VARCHAR(16) UNIQUE NOT NULL,
-    county_id INTEGER,
+    county_id INTEGER NOT NULL,
     CONSTRAINT zip_code_pk PRIMARY KEY (id),
     CONSTRAINT county_id_fk FOREIGN KEY (county_id) REFERENCES county ON DELETE
     SET NULL
@@ -50,16 +50,16 @@ CREATE TABLE zip_code (
 
 CREATE TABLE address (
     id INTEGER,
-    zip_code_id INTEGER,
+    zip_code_id INTEGER NOT NULL,
     street_name VARCHAR(128) NOT NULL,
     door_number INTEGER,
     CONSTRAINT address_pk PRIMARY KEY (id),
     CONSTRAINT zip_code_id_fk FOREIGN KEY (zip_code_id) REFERENCES zip_code ON DELETE
     SET NULL,
     CONSTRAINT door_number_check CHECK (
-            door_number IS NULL
+        door_number IS NULL
         OR door_number >= 1
-        ),
+    ),
     CONSTRAINT address_unique UNIQUE (zip_code_id, street_name, door_number)
 );
 
@@ -101,11 +101,10 @@ CREATE TABLE vaccine (
     additional_info VARCHAR(4096),
     CONSTRAINT vaccine PRIMARY KEY (id),
     CONSTRAINT prevents_pathology_id_fk FOREIGN KEY (prevents_pathology_id) REFERENCES pathology ON DELETE CASCADE,
-    CONSTRAINT inoculations_num_check CHECK (inoculations_number >= 0),
+    CONSTRAINT inoculations_num_check CHECK (inoculations_number > 0),
     CONSTRAINT temperature_range_check CHECK (
         minimum_temperature <= maximum_temperature
-    ),
-    CONSTRAINT vaccine_unique UNIQUE (name, producer)
+    )
 );
 
 CREATE TABLE vaccination_group (
@@ -116,7 +115,9 @@ CREATE TABLE vaccination_group (
     CONSTRAINT vaccination_group_pk PRIMARY KEY (id),
     CONSTRAINT age_range_check CHECK (
         minimum_age >= 0
-        AND minimum_age <= maximum_age
+        AND (
+            minimum_age <= maximum_age OR maximum_age IS NULL
+        )
     ),
     CONSTRAINT priority_level_check CHECK (priority_level >= 0)
 );
@@ -190,21 +191,22 @@ CREATE TABLE inoculation (
     vaccine_id INTEGER NOT NULL,
     citizen_id INTEGER NOT NULL,
     CONSTRAINT inoculation_pk PRIMARY KEY (id),
-    CONSTRAINT inoculation_unique UNIQUE (inoculation_number, date, vaccine_id, citizen_id),
     CONSTRAINT inoculation_vaccination_centre_fk FOREIGN KEY (vaccination_centre_id) REFERENCES vaccination_centre ON DELETE
     SET NULL,
     CONSTRAINT inoculation_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
     CONSTRAINT inoculation_citizen_fk FOREIGN KEY (citizen_id) REFERENCES citizen ON DELETE CASCADE,
-    CONSTRAINT inoculation_number_check CHECK (inoculation_number >= 1)
+    CONSTRAINT inoculation_number_check CHECK (inoculation_number >= 1),
+    CONSTRAINT inoculation_unique UNIQUE (inoculation_number, date, vaccine_id, citizen_id)
 );
 
 CREATE TABLE infrastructure (
     id INTEGER,
-    address_id INTEGER,
+    address_id INTEGER NOT NULL,
     total_stored_vaccines INTEGER,
     CONSTRAINT infrastructure_pk PRIMARY KEY (id),
     CONSTRAINT infrastructure_address_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE
-    SET NULL
+    SET NULL,
+    CONSTRAINT infrastructure_total_stored_vaccines_check CHECK (total_stored_vaccines >= 0)
 );
 
 CREATE TABLE storehouse (
@@ -214,7 +216,8 @@ CREATE TABLE storehouse (
     maximum_temperature FLOAT,
     CONSTRAINT storehouse_pk PRIMARY KEY (infrastructure_id),
     CONSTRAINT storehouse_infrastructure_fk FOREIGN KEY (infrastructure_id) REFERENCES infrastructure ON DELETE CASCADE,
-    CONSTRAINT temperature_check CHECK (
+    CONSTRAINT storehouse_maximum_capacity_check CHECK (maximum_capacity IS NULL OR maximum_capacity > 0),
+    CONSTRAINT storehouse_temperature_check CHECK (
         minimum_temperature IS NULL
         OR maximum_temperature IS NULL
         OR maximum_temperature >= minimum_temperature
@@ -257,7 +260,12 @@ CREATE TABLE transportation (
     SET NULL,
     CONSTRAINT transportation_infrastructre_fk2 FOREIGN KEY ("to") REFERENCES infrastructure ON DELETE CASCADE,
     CONSTRAINT transportation_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
-    CONSTRAINT transportation_amount_check CHECK (amount > 0)
+    CONSTRAINT transportation_amount_check CHECK (amount > 0),
+    CONSTRAINT transportation_date_check CHECK (
+        shipment_date IS NULL
+        OR arrival_date IS NULL
+        OR arrival_date >= shipment_date
+    )
 );
 
 CREATE TABLE vaccine_storage (
@@ -267,7 +275,7 @@ CREATE TABLE vaccine_storage (
     CONSTRAINT vaccine_storage_pk PRIMARY KEY (vaccine_id, infrastructure_id),
     CONSTRAINT vaccine_storage_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
     CONSTRAINT vaccine_storage_infrastructure_fk FOREIGN KEY (infrastructure_id) REFERENCES infrastructure ON DELETE CASCADE,
-    CONSTRAINT storage_amount_check CHECK (
+    CONSTRAINT vaccine_storage_storage_amount_check CHECK (
         amount IS NULL
         OR amount >= 0
     )
