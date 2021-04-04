@@ -237,11 +237,12 @@ CREATE TABLE vaccination_centre (
 );
 
 CREATE TABLE delivery (
-    distribution_centre_id INTEGER,
+    id INTEGER,
+    distribution_centre_id INTEGER NOT NULL,
     vaccine_id INTEGER NOT NULL,
     amount INTEGER NOT NULL,
     arrival_date DATE,
-    CONSTRAINT delivery_pk PRIMARY KEY (distribution_centre_id, vaccine_id),
+    CONSTRAINT delivery_pk PRIMARY KEY (id),
     CONSTRAINT delivery_distribution_centre_fk FOREIGN KEY (distribution_centre_id) REFERENCES distribution_centre ON DELETE CASCADE,
     CONSTRAINT delivery_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
     CONSTRAINT delivery_amount_check CHECK (amount > 0)
