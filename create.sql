@@ -2,7 +2,7 @@ PRAGMA foreign_keys = on;
 DROP TABLE IF EXISTS job_group_vaccination_group;
 DROP TABLE IF EXISTS pathology_vaccination_group;
 DROP TABLE IF EXISTS pathology_reacts_adversely_to_vaccine;
-DROP TABLE IF EXISTS citizen_belogs_to_vaccination_group;
+DROP TABLE IF EXISTS citizen_belongs_to_vaccination_group;
 DROP TABLE IF EXISTS vaccination_group_vaccine;
 DROP TABLE IF EXISTS citizen_has_pathology;
 DROP TABLE IF EXISTS inoculation;
@@ -72,7 +72,7 @@ CREATE TABLE job_group (
 
 CREATE TABLE job (
     id INTEGER,
-    name VARCHAR(32) UNIQUE NOT NULL,
+    name VARCHAR(32) NOT NULL,
     group_id INTEGER,
     address_id INTEGER NOT NULL,
     CONSTRAINT job_pk PRIMARY KEY (id),
@@ -174,7 +174,7 @@ CREATE TABLE citizen_has_pathology (
     CONSTRAINT citizen_has_pathology_pathology_fk FOREIGN KEY (pathology_id) REFERENCES pathology ON DELETE CASCADE
 );
 
-CREATE TABLE citizen_belogs_to_vaccination_group (
+CREATE TABLE citizen_belongs_to_vaccination_group (
     citizen_id INTEGER,
     vaccination_group_id INTEGER,
     CONSTRAINT citizen_has_pathology_pk PRIMARY KEY (citizen_id, vaccination_group_id),

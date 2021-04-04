@@ -1,0 +1,18 @@
+insert into district (id, name) values (1, 'Aveiro');
+insert into district (id, name) values (2, 'Beja');
+insert into district (id, name) values (3, 'Braga');
+insert into district (id, name) values (4, 'Bragança');
+insert into district (id, name) values (5, 'Castelo Branco');
+insert into district (id, name) values (6, 'Coimbra');
+insert into district (id, name) values (7, 'Évora');
+insert into district (id, name) values (8, 'Faro');
+insert into district (id, name) values (9, 'Guarda');
+insert into district (id, name) values (10, 'Leiria');
+insert into district (id, name) values (11, 'Lisboa');
+insert into district (id, name) values (12, 'Portalegre');
+insert into district (id, name) values (13, 'Porto');
+insert into district (id, name) values (14, 'Santarém');
+insert into district (id, name) values (15, 'Setúbal');
+insert into district (id, name) values (16, 'Viana do Castelo');
+insert into district (id, name) values (17, 'Vila Real');
+insert into district (id, name) values (18, 'Viseu');
