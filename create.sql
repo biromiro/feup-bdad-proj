@@ -1,4 +1,5 @@
 PRAGMA foreign_keys = on;
+
 DROP TABLE IF EXISTS job_group_vaccination_group;
 DROP TABLE IF EXISTS pathology_vaccination_group;
 DROP TABLE IF EXISTS pathology_reacts_adversely_to_vaccine;
@@ -44,8 +45,7 @@ CREATE TABLE zip_code (
     zip_code VARCHAR(16) UNIQUE NOT NULL,
     county_id INTEGER NOT NULL,
     CONSTRAINT zip_code_pk PRIMARY KEY (id),
-    CONSTRAINT county_id_fk FOREIGN KEY (county_id) REFERENCES county ON DELETE
-    SET NULL
+    CONSTRAINT county_id_fk FOREIGN KEY (county_id) REFERENCES county ON DELETE CASCADE
 );
 
 CREATE TABLE address (
@@ -54,8 +54,7 @@ CREATE TABLE address (
     street_name VARCHAR(128) NOT NULL,
     door_number INTEGER,
     CONSTRAINT address_pk PRIMARY KEY (id),
-    CONSTRAINT zip_code_id_fk FOREIGN KEY (zip_code_id) REFERENCES zip_code ON DELETE
-    SET NULL,
+    CONSTRAINT zip_code_id_fk FOREIGN KEY (zip_code_id) REFERENCES zip_code ON DELETE CASCADE,
     CONSTRAINT door_number_check CHECK (
         door_number IS NULL
         OR door_number >= 1
@@ -78,7 +77,7 @@ CREATE TABLE job (
     CONSTRAINT job_pk PRIMARY KEY (id),
     CONSTRAINT group_id_fk FOREIGN KEY (group_id) REFERENCES job_group ON DELETE
     SET NULL,
-    CONSTRAINT address_id_fk FOREIGN KEY (address_id) REFERENCES address,
+    CONSTRAINT address_id_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE CASCADE,
     CONSTRAINT job_unique UNIQUE (name, group_id, address_id)
 );
 
@@ -116,7 +115,8 @@ CREATE TABLE vaccination_group (
     CONSTRAINT age_range_check CHECK (
         minimum_age >= 0
         AND (
-            minimum_age <= maximum_age OR maximum_age IS NULL
+            minimum_age <= maximum_age
+            OR maximum_age IS NULL
         )
     ),
     CONSTRAINT priority_level_check CHECK (priority_level >= 0)
@@ -137,10 +137,11 @@ CREATE TABLE citizen (
     birth_date DATE NOT NULL,
     gender VARCHAR(32) NOT NULL,
     job_id INTEGER,
-    address_id INTEGER NOT NULL,
+    address_id INTEGER,
     CONSTRAINT citizen_pk PRIMARY KEY (id),
     CONSTRAINT citizen_job_fk FOREIGN KEY (job_id) REFERENCES job ON DELETE
-    SET NULL
+    SET NULL,
+    CONSTRAINT citizen_address_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE SET NULL
 );
 
 CREATE TABLE job_group_vaccination_group (
@@ -204,8 +205,7 @@ CREATE TABLE infrastructure (
     address_id INTEGER NOT NULL,
     total_stored_vaccines INTEGER,
     CONSTRAINT infrastructure_pk PRIMARY KEY (id),
-    CONSTRAINT infrastructure_address_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE
-    SET NULL,
+    CONSTRAINT infrastructure_address_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE CASCADE,
     CONSTRAINT infrastructure_total_stored_vaccines_check CHECK (total_stored_vaccines >= 0)
 );
 
@@ -216,7 +216,10 @@ CREATE TABLE storehouse (
     maximum_temperature FLOAT,
     CONSTRAINT storehouse_pk PRIMARY KEY (infrastructure_id),
     CONSTRAINT storehouse_infrastructure_fk FOREIGN KEY (infrastructure_id) REFERENCES infrastructure ON DELETE CASCADE,
-    CONSTRAINT storehouse_maximum_capacity_check CHECK (maximum_capacity IS NULL OR maximum_capacity > 0),
+    CONSTRAINT storehouse_maximum_capacity_check CHECK (
+        maximum_capacity IS NULL
+        OR maximum_capacity > 0
+    ),
     CONSTRAINT storehouse_temperature_check CHECK (
         minimum_temperature IS NULL
         OR maximum_temperature IS NULL
