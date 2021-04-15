@@ -36,8 +36,8 @@ CREATE TABLE county (
     name VARCHAR(64) NOT NULL,
     district_id INTEGER NOT NULL,
     CONSTRAINT county_pk PRIMARY KEY (id),
-    CONSTRAINT district_id_fk FOREIGN KEY (district_id) REFERENCES district ON DELETE CASCADE,
-    CONSTRAINT name_unique UNIQUE (name, district_id)
+    CONSTRAINT county_district_fk FOREIGN KEY (district_id) REFERENCES district ON DELETE CASCADE,
+    CONSTRAINT county_name_unique UNIQUE (name, district_id)
 );
 
 CREATE TABLE zip_code (
@@ -45,17 +45,17 @@ CREATE TABLE zip_code (
     zip_code VARCHAR(16) UNIQUE NOT NULL,
     county_id INTEGER NOT NULL,
     CONSTRAINT zip_code_pk PRIMARY KEY (id),
-    CONSTRAINT county_id_fk FOREIGN KEY (county_id) REFERENCES county ON DELETE CASCADE
+    CONSTRAINT zip_code_county_fk FOREIGN KEY (county_id) REFERENCES county ON DELETE CASCADE
 );
 
 CREATE TABLE address (
     id INTEGER,
-    zip_code_id INTEGER NOT NULL,
+    zip_code_id INTEGER,
     street_name VARCHAR(128) NOT NULL,
     door_number INTEGER,
     CONSTRAINT address_pk PRIMARY KEY (id),
-    CONSTRAINT zip_code_id_fk FOREIGN KEY (zip_code_id) REFERENCES zip_code ON DELETE CASCADE,
-    CONSTRAINT door_number_check CHECK (
+    CONSTRAINT address_zip_code_fk FOREIGN KEY (zip_code_id) REFERENCES zip_code ON DELETE SET NULL,
+    CONSTRAINT address_door_number_check CHECK (
         door_number IS NULL
         OR door_number >= 1
     ),
@@ -73,11 +73,10 @@ CREATE TABLE job (
     id INTEGER,
     name VARCHAR(32) NOT NULL,
     group_id INTEGER,
-    address_id INTEGER NOT NULL,
+    address_id INTEGER,
     CONSTRAINT job_pk PRIMARY KEY (id),
-    CONSTRAINT group_id_fk FOREIGN KEY (group_id) REFERENCES job_group ON DELETE
-    SET NULL,
-    CONSTRAINT address_id_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE CASCADE,
+    CONSTRAINT job_group_fk FOREIGN KEY (group_id) REFERENCES job_group ON DELETE SET NULL,
+    CONSTRAINT job_address_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE SET NULL,
     CONSTRAINT job_unique UNIQUE (name, group_id, address_id)
 );
 
@@ -99,9 +98,9 @@ CREATE TABLE vaccine (
     route VARCHAR(16),
     additional_info VARCHAR(4096),
     CONSTRAINT vaccine PRIMARY KEY (id),
-    CONSTRAINT prevents_pathology_id_fk FOREIGN KEY (prevents_pathology_id) REFERENCES pathology ON DELETE CASCADE,
-    CONSTRAINT inoculations_num_check CHECK (inoculations_number > 0),
-    CONSTRAINT temperature_range_check CHECK (
+    CONSTRAINT vaccine_prevents_pathology_fk FOREIGN KEY (prevents_pathology_id) REFERENCES pathology ON DELETE CASCADE,
+    CONSTRAINT vaccine_inoculations_num_check CHECK (inoculations_number > 0),
+    CONSTRAINT vaccine_temperature_range_check CHECK (
         minimum_temperature <= maximum_temperature
     )
 );
@@ -112,14 +111,14 @@ CREATE TABLE vaccination_group (
     maximum_age INTEGER,
     priority_level INTEGER NOT NULL,
     CONSTRAINT vaccination_group_pk PRIMARY KEY (id),
-    CONSTRAINT age_range_check CHECK (
+    CONSTRAINT vaccination_group_age_range_check CHECK (
         minimum_age >= 0
         AND (
             minimum_age <= maximum_age
             OR maximum_age IS NULL
         )
     ),
-    CONSTRAINT priority_level_check CHECK (priority_level >= 0)
+    CONSTRAINT vaccination_group_priority_level_check CHECK (priority_level >= 0)
 );
 
 CREATE TABLE pathology_reacts_adversely_to_vaccine (
@@ -139,8 +138,7 @@ CREATE TABLE citizen (
     job_id INTEGER,
     address_id INTEGER,
     CONSTRAINT citizen_pk PRIMARY KEY (id),
-    CONSTRAINT citizen_job_fk FOREIGN KEY (job_id) REFERENCES job ON DELETE
-    SET NULL,
+    CONSTRAINT citizen_job_fk FOREIGN KEY (job_id) REFERENCES job ON DELETE SET NULL,
     CONSTRAINT citizen_address_fk FOREIGN KEY (address_id) REFERENCES address ON DELETE SET NULL
 );
 
@@ -192,8 +190,7 @@ CREATE TABLE inoculation (
     vaccine_id INTEGER NOT NULL,
     citizen_id INTEGER NOT NULL,
     CONSTRAINT inoculation_pk PRIMARY KEY (id),
-    CONSTRAINT inoculation_vaccination_centre_fk FOREIGN KEY (vaccination_centre_id) REFERENCES vaccination_centre ON DELETE
-    SET NULL,
+    CONSTRAINT inoculation_vaccination_centre_fk FOREIGN KEY (vaccination_centre_id) REFERENCES vaccination_centre ON DELETE SET NULL,
     CONSTRAINT inoculation_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
     CONSTRAINT inoculation_citizen_fk FOREIGN KEY (citizen_id) REFERENCES citizen ON DELETE CASCADE,
     CONSTRAINT inoculation_number_check CHECK (inoculation_number >= 1),
@@ -240,11 +237,12 @@ CREATE TABLE vaccination_centre (
 );
 
 CREATE TABLE delivery (
-    distribution_centre_id INTEGER,
+    id INTEGER,
+    distribution_centre_id INTEGER NOT NULL,
     vaccine_id INTEGER NOT NULL,
     amount INTEGER NOT NULL,
     arrival_date DATE,
-    CONSTRAINT delivery_pk PRIMARY KEY (distribution_centre_id, vaccine_id),
+    CONSTRAINT delivery_pk PRIMARY KEY (id),
     CONSTRAINT delivery_distribution_centre_fk FOREIGN KEY (distribution_centre_id) REFERENCES distribution_centre ON DELETE CASCADE,
     CONSTRAINT delivery_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
     CONSTRAINT delivery_amount_check CHECK (amount > 0)
@@ -259,8 +257,7 @@ CREATE TABLE transportation (
     "to" INTEGER NOT NULL,
     vaccine_id INTEGER NOT NULL,
     CONSTRAINT transportation_pk PRIMARY KEY (id),
-    CONSTRAINT transportation_infrastructre_fk1 FOREIGN KEY ("from") REFERENCES infrastructure ON DELETE
-    SET NULL,
+    CONSTRAINT transportation_infrastructre_fk1 FOREIGN KEY ("from") REFERENCES infrastructure ON DELETE SET NULL,
     CONSTRAINT transportation_infrastructre_fk2 FOREIGN KEY ("to") REFERENCES infrastructure ON DELETE CASCADE,
     CONSTRAINT transportation_vaccine_fk FOREIGN KEY (vaccine_id) REFERENCES vaccine ON DELETE CASCADE,
     CONSTRAINT transportation_amount_check CHECK (amount > 0),
