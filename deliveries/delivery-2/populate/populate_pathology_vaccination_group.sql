@@ -1,0 +1,15 @@
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (2, 8);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (162, 4);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (64, 9);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (222, 8);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (99, 3);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (135, 9);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (41, 2);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (210, 2);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (196, 8);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (130, 4);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (199, 5);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (120, 1);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (182, 9);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (156, 7);
+INSERT INTO pathology_vaccination_group (pathology_id, vaccination_group_id) VALUES (197, 8);

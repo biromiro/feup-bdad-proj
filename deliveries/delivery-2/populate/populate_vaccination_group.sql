@@ -1,0 +1,10 @@
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (1, 16, 29, 5);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (2, 55, 75, 1);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (3, 70, null, 1);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (4, 60, null, 5);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (5, 55, 79, 1);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (6, 30, 50, 4);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (7, 51, 59, 2);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (8, 60, 69, 2);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (9, 70, null, 1);
+insert into vaccination_group (id, minimum_age, maximum_age, priority_level) values (10, 16, 39, 5);

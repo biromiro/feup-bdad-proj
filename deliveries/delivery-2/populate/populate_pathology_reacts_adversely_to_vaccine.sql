@@ -1,0 +1,15 @@
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (34, 177);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (27, 133);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (30, 214);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (38, 24);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (23, 192);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (36, 151);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (17, 1);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (21, 47);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (51, 138);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (50, 220);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (43, 101);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (10, 133);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (11, 67);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (20, 49);
+INSERT INTO pathology_reacts_adversely_to_vaccine (vaccine_id, pathology_id) VALUES (2, 169);
