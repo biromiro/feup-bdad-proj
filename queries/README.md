@@ -28,7 +28,7 @@ WHERE pathology_occurences.occurences = (
 
 ### Query 3
 
-What is the percentage of people vaccinated with at least one those and fully dosed?
+What is the percentage of people vaccinated with at least one dose and fully dosed?
 
 ```sql
 DROP VIEW IF EXISTS vaccines;
@@ -116,7 +116,7 @@ SELECT pathology.scientific_name,
     vaccine.producer,
     vaccine.name
 FROM pathology
-    LEFT JOIN vaccine ON vaccine.prevents_pathology_id = pathology.id;
+    JOIN vaccine ON vaccine.prevents_pathology_id = pathology.id;
 ```
 
 ### Query 12
@@ -181,14 +181,14 @@ WHERE pathology.id NOT IN (
 What is the number of citizens by age group?
 
 ```sql
-SELECT CAST(
+SELECT ((age_group * 10) || '-' || (9 + age_group * 10)) AS age_group, people_count FROM (SELECT CAST(
         (
             julianday(date('now')) - julianday(citizen.birth_date)
         ) / 365 / 10 AS INTEGER
     ) AS age_group,
     COUNT(*) AS people_count
 FROM citizen
-GROUP BY age_group;
+GROUP BY age_group);
 ```
 
 ### Query 19
