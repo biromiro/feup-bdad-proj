@@ -48,3 +48,129 @@ from vaccine
     left join (select * from vaccine_storage where infrastructure_id = 48) as storage on storage.vaccine_id = vaccine.id
     left join infrastructure on infrastructure.id = storage.infrastructure_id
 order by vaccine.id;
+
+-- perguntar a taxa de pessoas vacinadas para uma certa patologia e quantas tem pelo menos uma dose
+DROP VIEW IF EXISTS vaccines;
+CREATE VIEW vaccines AS
+SELECT vaccine.id
+FROM vaccine
+WHERE vaccine.prevents_pathology_id = 56;
+-- change this ihihi, 56 is covid btw
+DROP VIEW IF EXISTS vaccinated;
+CREATE VIEW vaccinated AS
+SELECT DISTINCT citizen.id
+FROM
+    inoculation
+    JOIN citizen ON inoculation.citizen_id = citizen.id
+WHERE
+    inoculation.vaccine_id IN vaccines;
+---
+DROP VIEW IF EXISTS vaccinated_with_doses;
+CREATE VIEW vaccinated_with_doses AS
+SELECT
+    citizen_id,
+    inoculation_number,
+    vaccine_inoculations_number,
+    (
+        CASE
+            WHEN inoculation_number = vaccine_inoculations_number THEN 1
+            ELSE 0
+        END
+    ) AS fully_vaccinated
+FROM
+    (
+        SELECT
+            vaccinated.id AS citizen_id,
+            inoculation.date,
+            inoculation.inoculation_number,
+            vaccine.inoculations_number AS vaccine_inoculations_number,
+            MAX(inoculation.date) AS most_recent_date
+        FROM
+            vaccinated
+            JOIN inoculation ON vaccinated.id = inoculation.citizen_id
+            JOIN vaccine ON vaccine.id = inoculation.vaccine_id
+        GROUP BY
+            citizen_id
+    );
+SELECT
+    *
+FROM
+    vaccinated_with_doses;
+---
+SELECT
+    (
+        (
+            100.0 * (
+                SELECT
+                    COUNT(*)
+                FROM
+                    vaccinated_with_doses
+                WHERE
+                    fully_vaccinated = 1
+            ) / people_count
+        ) || '%'
+    ) AS fully_vaccinated,
+    (
+        (
+            100.0 * (
+                SELECT
+                    COUNT(*)
+                FROM
+                    vaccinated_with_doses
+                WHERE
+                    fully_vaccinated = 0
+            ) / people_count
+        ) || '%'
+    ) AS at_least_one_those
+FROM
+    (
+        SELECT
+            COUNT(*) AS people_count
+        FROM
+            citizen
+    );
+
+-- mine
+-- perguntar a taxa de pessoas vacinadas para uma certa patologia e quantas tem pelo menos uma dose
+drop view if exists citizen_vaccine_numbers;
+create view citizen_vaccine_numbers as
+select inoculation.citizen_id,
+        vaccine.id as vaccine_id,
+        pathology.id as pathology_id,
+        count(*) as inoculations_taken,
+        vaccine.inoculations_number, vaccine.inoculations_number - count(*) as inoculations_remaining
+from inoculation
+    join vaccine on vaccine.id = inoculation.vaccine_id
+    join pathology on pathology.id = vaccine.prevents_pathology_id
+group by inoculation.citizen_id, vaccine.id;
+
+drop view if exists citizens_vaccine_pathologies;
+create view citizens_vaccine_pathologies as
+select citizen_id, pathology_id, inoculations_taken, min(inoculations_remaining) as inoculations_remaining
+from citizen_vaccine_numbers
+group by citizen_id, pathology_id;
+
+drop view if exists fully_vaccinated_pathology;
+create view fully_vaccinated_pathology as
+select pathology_id, count(*) as fully_vaccinated
+from citizens_vaccine_pathologies
+where inoculations_remaining = 0
+group by pathology_id;
+
+drop view if exists at_least_one_vaccinated_pathology;
+create view at_least_one_vaccinated_pathology as
+select pathology_id, count(*) as one_dose_vaccinated
+from citizens_vaccine_pathologies
+group by pathology_id;
+
+with citizens as (select cast(count(*) as real) as amount from citizen)
+select pathology.id,
+        pathology.common_name,
+        (ifnull(one_dose_vaccinated, 0) / citizens.amount * 100) || '%' as one_dose_vaccinated,
+        (ifnull(fully_vaccinated, 0) / citizens.amount * 100) || '%' as fully_vaccinated
+from pathology
+    left join fully_vaccinated_pathology on fully_vaccinated_pathology.pathology_id = pathology.id
+    left join at_least_one_vaccinated_pathology using(pathology_id),
+    citizens;
+
+  a  
