@@ -1,4 +1,5 @@
 -- 6
+-- What is the disease with the highest vaccination rate?
 
 SELECT MAX(rate) as rate, common_name as disease
 FROM (
@@ -8,6 +9,7 @@ FROM (
 
 
 -- 9
+-- What is the percentage of people per county that are vaccinated for a given disease (in this case, covid).
 
 CREATE VIEW counties_with_covid_inoculated AS
 SELECT COUNT(CASE WHEN vaccine.inoculations_number = inoculation.inoculation_number THEN 1 ELSE null END) as completely_vaccinated_num,
@@ -43,6 +45,7 @@ SELECT county_name, CAST(completely_vaccinated_num AS REAL) * 100 / population a
 FROM covid_vaccination_per_county;
 
 -- 10
+-- What is the incidence per 100k of infection of a given disease (in this case, covid)? 
 
 SELECT (CAST(covid_infected AS REAL) * 100000 /  (SELECT COUNT(*) FROM citizen)) as covid_infected_per_100k
 FROM (SELECT COUNT(*) as covid_infected
@@ -51,6 +54,7 @@ FROM (SELECT COUNT(*) as covid_infected
      
 
 -- 11
+-- What is the incidence per 100k per county of infection of a given disease (in this case, covid)? 
 
 SELECT county_name, 
        (CASE WHEN population <> 0 THEN (completely_vaccinated_num + mid_vaccination_num) * 100000 / CAST(population AS REAL) ELSE 0.0 END)
@@ -58,6 +62,7 @@ SELECT county_name,
 FROM covid_vaccination_per_county;
 
 -- 14
+-- How many inoculations were administrated for a given pathology (in this case, covid) in a given day (in this case, 2021-03-05)?
 
 SELECT COUNT(*) as number_of_inoculations, date
 FROM inoculation
@@ -66,6 +71,8 @@ JOIN pathology ON vaccine.prevents_pathology_id = pathology.id
 WHERE pathology.id = 56 AND date = "2021-03-05";
 
 -- 15
+-- What is the capacity per capita to hold vaccines in each district?
+
 CREATE VIEW districts_with_capacity AS
 SELECT SUM(maximum_capacity) AS capacity, district.id AS district_id, district.name AS district_name
     FROM storehouse
@@ -94,6 +101,8 @@ FROM (SELECT district_name, CAST((CASE WHEN population IS NULL THEN 0 ELSE capac
         ON T.district_id = S.district_id);
 
 -- 17
+-- Which vaccines do not have a storehouse that could hold it (according to temperature restrictions)?
+
 SELECT vaccine.name, vaccine.minimum_temperature, vaccine.maximum_temperature
 FROM vaccine
 WHERE vaccine.id NOT IN (
