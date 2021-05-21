@@ -43,5 +43,5 @@ FROM (
     ) AS vaccinated_age_groups ON age_groups.age_group = vaccinated_age_groups.age_group;
 
 SELECT ((age_group * 10) || '-' || (9 + age_group * 10)) AS age_group,
-    (100.0 * vaccinated_people / people_count) AS percentage
+    (100.0 * vaccinated_people / people_count) || '%' AS percentage
 FROM vaccination_by_age_group;

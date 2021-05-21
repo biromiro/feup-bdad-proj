@@ -1,8 +1,8 @@
 SELECT pathology.id,
-    (
+    ifnull((
         (julianday(MAX(date)) - julianday(MIN(date))) / COUNT(*)
-    ) || ' per day' AS inoculation_rate
-FROM inoculation
-    JOIN vaccine ON vaccine.id = inoculation.vaccine_id
-    JOIN pathology ON pathology.id = vaccine.prevents_pathology_id
+    ), 0) || ' per day' AS inoculation_rate
+FROM pathology
+    LEFT JOIN vaccine ON vaccine.prevents_pathology_id = pathology.id
+    LEFT JOIN inoculation ON inoculation.vaccine_id = vaccine.id
 GROUP BY pathology.id;
