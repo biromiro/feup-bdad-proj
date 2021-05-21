@@ -253,8 +253,8 @@ FROM (
         UNION
         SELECT 0,
             0,
-            county.id AS county_id,
-            county.name AS county_name
+            county.id as county_id,
+            county.name as county_name
         FROM county
         WHERE county.id NOT IN (
                 SELECT county_id
@@ -262,8 +262,8 @@ FROM (
             )
     ) AS T
     LEFT JOIN (
-        SELECT COUNT(*) AS population,
-            county.id AS county_id
+        SELECT COUNT(*) as population,
+            county.id as county_id
         FROM county
             JOIN zip_code ON county.id = zip_code.county_id
             JOIN address ON zip_code.id = address.zip_code_id
@@ -272,7 +272,7 @@ FROM (
     ) AS S ON T.county_id = S.county_id;
     
 SELECT county_name,
-    CAST(completely_vaccinated_num AS REAL) * 100 / population AS percentage
+    IFNULL(CAST(completely_vaccinated_num AS REAL) * 100 / population, 0) AS percentage
 FROM covid_vaccination_per_county;
 ```
 
@@ -533,7 +533,7 @@ FROM (
     ) AS vaccinated_age_groups ON age_groups.age_group = vaccinated_age_groups.age_group;
 
 SELECT ((age_group * 10) || '-' || (9 + age_group * 10)) AS age_group,
-    (100.0 * vaccinated_people / people_count) AS percentage
+    (100.0 * vaccinated_people / people_count) || '%' AS percentage
 FROM vaccination_by_age_group;
 ```
 
