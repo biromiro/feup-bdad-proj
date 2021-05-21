@@ -1,6 +1,6 @@
-SELECT pathology.id,
-    ifnull((
-        (julianday(MAX(date)) - julianday(MIN(date))) / COUNT(*)
+SELECT pathology.id, pathology.common_name,
+    IFNULL((
+        COUNT(*) / (julianday(MAX(date)) - julianday(MIN(date)))
     ), 0) || ' per day' AS inoculation_rate
 FROM pathology
     LEFT JOIN vaccine ON vaccine.prevents_pathology_id = pathology.id
