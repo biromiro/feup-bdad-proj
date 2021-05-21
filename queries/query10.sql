@@ -60,5 +60,5 @@ FROM (
     ) AS S ON T.county_id = S.county_id;
     
 SELECT county_name,
-    CAST(completely_vaccinated_num AS REAL) * 100 / population AS percentage
+    IFNULL(CAST(completely_vaccinated_num AS REAL) * 100 / population, 0) AS percentage
 FROM covid_vaccination_per_county;
