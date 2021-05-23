@@ -1,11 +1,10 @@
-SELECT (
-        CAST(covid_infected AS REAL) * 100000 / (
-            SELECT COUNT(*)
-            FROM citizen
-        )
-    ) AS covid_infected_per_100k
-FROM (
-        SELECT COUNT(*) AS covid_infected
+WITH citizens AS (
+        SELECT CAST(COUNT(*) AS real) AS amount
+        FROM citizen),
+    covid AS (
+        SELECT COUNT(*) AS infected
         FROM citizen_has_pathology
         WHERE citizen_has_pathology.pathology_id = 56
-    );
+    )
+SELECT covid.infected * 100000 / citizens.amount AS covid_infected_per_100k
+FROM citizens, covid;

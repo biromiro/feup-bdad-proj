@@ -84,13 +84,23 @@ DROP TRIGGER IF EXISTS vaccine_transportation_amount_check_trigger;
 CREATE TRIGGER vaccine_transportation_amount_check_trigger BEFORE
 INSERT ON transportation FOR EACH ROW BEGIN
 SELECT CASE
+        WHEN NOT EXISTS (
+            SELECT *
+            FROM infrastructure AS origin
+                JOIN vaccine_storage ON vaccine_storage.infrastructure_id = origin.id
+            WHERE origin.id = NEW."from"
+                AND vaccine_storage.vaccine_id = NEW.vaccine_id
+        ) THEN RAISE (
+            ABORT,
+            "The origin infrastructure does not have that vaccine"
+        )
         WHEN EXISTS (
             SELECT *
             FROM infrastructure AS origin
                 JOIN vaccine_storage ON vaccine_storage.infrastructure_id = origin.id
             WHERE origin.id = NEW."from"
                 AND vaccine_storage.vaccine_id = NEW.vaccine_id
-                AND (vaccine_storage.amount < NEW.amount)
+                AND vaccine_storage.amount < NEW.amount
         ) THEN RAISE (
             ABORT,
             "The origin infrastructure does not have the vaccine amount"
@@ -110,23 +120,6 @@ END;
 ```
 
 ## Trigger 4: Verify if the destination storehouse of new transportation meet the temperature requirements of the vaccine that is transported
-
-```sql
-DROP TRIGGER IF EXISTS check_validity_vaccine_dose;
-CREATE TRIGGER check_validity_vaccine_dose BEFORE
-INSERT ON inoculation FOR EACH ROW
-    WHEN EXISTS (
-        SELECT *
-        FROM vaccine
-        WHERE vaccine.id = NEW.vaccine_id
-            AND vaccine.inoculations_number < NEW.inoculation_number
-    )
-    OR NEW.inoculation_number < 0 BEGIN
-SELECT RAISE (ABORT, "The dose of the vaccine is invalid!");
-END;
-```
-
-## Trigger 5: Verify if an inoculation number is in the range of the number of inoculations of a given vaccine
 
 ```sql
 DROP TRIGGER IF EXISTS temp_check_on_transp_to_storehouse_trigger;
@@ -168,5 +161,22 @@ SELECT CASE
             "The destiny storehouse does not assure that the vaccines can be stored safely!"
         )
     END;
+END;
+```
+
+## Trigger 5: Verify if an inoculation number is in the range of the number of inoculations of a given vaccine
+
+```sql
+DROP TRIGGER IF EXISTS check_validity_vaccine_dose;
+CREATE TRIGGER check_validity_vaccine_dose BEFORE
+INSERT ON inoculation FOR EACH ROW
+    WHEN EXISTS (
+        SELECT *
+        FROM vaccine
+        WHERE vaccine.id = NEW.vaccine_id
+            AND vaccine.inoculations_number < NEW.inoculation_number
+    )
+    OR NEW.inoculation_number <= 0 BEGIN
+SELECT RAISE (ABORT, "The dose of the vaccine is invalid!");
 END;
 ```

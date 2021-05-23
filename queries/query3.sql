@@ -11,6 +11,7 @@ FROM inoculation
     JOIN pathology ON pathology.id = vaccine.prevents_pathology_id
 GROUP BY  inoculation.citizen_id,
     vaccine.id;
+
 DROP view IF EXISTS citizens_vaccine_pathologies;
 CREATE view citizens_vaccine_pathologies AS
 SELECT citizen_id,
@@ -20,19 +21,22 @@ SELECT citizen_id,
 FROM citizen_vaccine_numbers
 GROUP BY  citizen_id,
     pathology_id;
+
 DROP view IF EXISTS fully_vaccinated_pathology;
 CREATE view fully_vaccinated_pathology AS
 SELECT pathology_id,
     COUNT(*) AS fully_vaccinated
 FROM citizens_vaccine_pathologies
-where inoculations_remaining = 0
+WHERE inoculations_remaining = 0
 GROUP BY  pathology_id;
-DROP view IF EXISTS at_leASt_one_vaccinated_pathology;
-CREATE view at_leASt_one_vaccinated_pathology AS
+
+DROP view IF EXISTS at_least_one_vaccinated_pathology;
+CREATE view at_least_one_vaccinated_pathology AS
 SELECT pathology_id,
     COUNT(*) AS one_dose_vaccinated
 FROM citizens_vaccine_pathologies
-GROUP BY  pathology_id;
+GROUP BY pathology_id;
+
 WITH citizens AS (
     SELECT CAST(COUNT(*) AS real) AS amount
     FROM citizen
@@ -47,5 +51,5 @@ SELECT pathology.id,
     ) || '%' AS fully_vaccinated
 FROM pathology
     LEFT JOIN fully_vaccinated_pathology ON fully_vaccinated_pathology.pathology_id = pathology.id
-    LEFT JOIN at_leASt_one_vaccinated_pathology USING(pathology_id),
+    LEFT JOIN at_least_one_vaccinated_pathology USING(pathology_id),
     citizens;
