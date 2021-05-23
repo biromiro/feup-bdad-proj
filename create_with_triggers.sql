@@ -368,50 +368,59 @@ SELECT CASE
 END;
 
 --
+DROP TRIGGER IF EXISTS delivery_vaccine_storage_trigger;
+CREATE TRIGGER delivery_vaccine_storage_trigger
+AFTER INSERT ON delivery
+FOR EACH ROW
+BEGIN
+
+    INSERT INTO vaccine_storage(infrastructure_id, vaccine_id, amount) 
+    SELECT NEW.distribution_centre_id, NEW.vaccine_id, 0
+    WHERE NOT EXISTS (
+        SELECT * FROM vaccine_storage WHERE NEW.distribution_centre_id = vaccine_storage.infrastructure_id AND NEW.vaccine_id = vaccine_storage.vaccine_id
+    );  
+
+    UPDATE vaccine_storage SET amount = amount + NEW.amount
+    WHERE
+        NEW.distribution_centre_id = vaccine_storage.infrastructure_id
+        AND NEW.vaccine_id = vaccine_storage.vaccine_id;
+        
+    UPDATE infrastructure SET total_stored_vaccines = total_stored_vaccines + NEW.amount
+    WHERE
+        NEW.distribution_centre_id = infrastructure.id;
+
+END;
+
+--
 DROP TRIGGER IF EXISTS transportation_vaccine_storage_trigger;
 CREATE TRIGGER transportation_vaccine_storage_trigger
 AFTER
 INSERT ON transportation FOR EACH ROW BEGIN
-UPDATE vaccine_storage
-SET amount = (
-        (
-            SELECT amount
-            FROM vaccine_storage
-            WHERE vaccine_storage.infrastructure_id = NEW."to"
-                AND vaccine_storage.vaccine_id = NEW.vaccine_id
-        ) + NEW.amount
-    )
-WHERE NEW."to" = vaccine_storage.infrastructure_id
-    AND NEW."vaccine_id" = vaccine_storage.vaccine_id;
-UPDATE vaccine_storage
-SET amount = (
-        (
-            SELECT amount
-            FROM vaccine_storage
-            WHERE vaccine_storage.infrastructure_id = NEW."from"
-                AND vaccine_storage.vaccine_id = NEW.vaccine_id
-        ) - NEW.amount
-    )
-WHERE NEW."from" = vaccine_storage.infrastructure_id
-    AND NEW."vaccine_id" = vaccine_storage.vaccine_id;
-UPDATE infrastructure
-SET total_stored_vaccines = (
-        (
-            SELECT total_stored_vaccines
-            FROM infrastructure
-            WHERE infrastructure.id = NEW."to"
-        ) + NEW.amount
-    )
-WHERE NEW."to" = infrastructure.id;
-UPDATE infrastructure
-SET total_stored_vaccines = (
-        (
-            SELECT total_stored_vaccines
-            FROM infrastructure
-            WHERE infrastructure.id = NEW."from"
-        ) - NEW.amount
-    )
-WHERE NEW."from" = infrastructure.id;
+
+    INSERT INTO vaccine_storage(infrastructure_id, vaccine_id, amount) 
+    SELECT NEW."to", NEW.vaccine_id, 0
+    WHERE NOT EXISTS (
+        SELECT * FROM vaccine_storage WHERE NEW."to" = vaccine_storage.infrastructure_id AND NEW.vaccine_id = vaccine_storage.vaccine_id
+    );  
+
+    UPDATE vaccine_storage
+    SET amount = amount - NEW.amount
+    WHERE NEW."from" = vaccine_storage.infrastructure_id
+        AND NEW.vaccine_id = vaccine_storage.vaccine_id;
+
+    UPDATE vaccine_storage
+    SET amount = amount + NEW.amount
+    WHERE NEW."to" = vaccine_storage.infrastructure_id
+        AND NEW.vaccine_id = vaccine_storage.vaccine_id;
+
+    UPDATE infrastructure
+    SET total_stored_vaccines = total_stored_vaccines + NEW.amount
+    WHERE NEW."to" = infrastructure.id;
+
+    UPDATE infrastructure
+    SET total_stored_vaccines = total_stored_vaccines - NEW.amount
+    WHERE NEW."from" = infrastructure.id;
+
 END;
 
 --
@@ -419,13 +428,23 @@ DROP TRIGGER IF EXISTS vaccine_transportation_amount_check_trigger;
 CREATE TRIGGER vaccine_transportation_amount_check_trigger BEFORE
 INSERT ON transportation FOR EACH ROW BEGIN
 SELECT CASE
+        WHEN NOT EXISTS (
+            SELECT *
+            FROM infrastructure AS origin
+                JOIN vaccine_storage ON vaccine_storage.infrastructure_id = origin.id
+            WHERE origin.id = NEW."from"
+                AND vaccine_storage.vaccine_id = NEW.vaccine_id
+        ) THEN RAISE (
+            ABORT,
+            "The origin infrastructure does not have that vaccine"
+        )
         WHEN EXISTS (
             SELECT *
             FROM infrastructure AS origin
                 JOIN vaccine_storage ON vaccine_storage.infrastructure_id = origin.id
             WHERE origin.id = NEW."from"
                 AND vaccine_storage.vaccine_id = NEW.vaccine_id
-                AND (vaccine_storage.amount < NEW.amount)
+                AND vaccine_storage.amount < NEW.amount
         ) THEN RAISE (
             ABORT,
             "The origin infrastructure does not have the vaccine amount"
@@ -460,7 +479,10 @@ END;
 --
 DROP TRIGGER IF EXISTS temp_check_on_transp_to_storehouse_trigger;
 CREATE TRIGGER temp_check_on_transp_to_storehouse_trigger BEFORE
-INSERT ON transportation FOR EACH ROW BEGIN
+INSERT ON transportation 
+FOR EACH ROW
+WHEN EXISTS (SELECT * FROM storehouse WHERE NEW."to" = storehouse.infrastructure_id)
+BEGIN
 SELECT CASE
         WHEN NOT EXISTS (
             SELECT *
