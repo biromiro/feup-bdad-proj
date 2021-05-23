@@ -11,7 +11,7 @@ SELECT "";
 SELECT "-- This trigger makes an insertion of a transportation fail in 3 ocasions:";
 SELECT "--   1. When the origin infrastructure does not have the transported vaccine;";
 SELECT "--   2. When the origin infrastructure has the vaccine, but not in the requested amount;";
-SELECT "--   3. When the destination infrastructure does not have enought storage to store the new vaccines;";
+SELECT "--   3. When the destination infrastructure does not have enough storage to store the new vaccines;";
 
 SELECT "";
 SELECT "-- Starting with the 1st error, unless the initial database was updated, the infrastructure 4 does not have";
@@ -32,7 +32,7 @@ SELECT "-- Running INSERT INTO transportation(amount, from, to, vaccine_id) VALU
 INSERT INTO transportation(amount, "from", "to", vaccine_id) VALUES (8000, 1, 18, 6);
 
 SELECT "";
-SELECT "-- Let's just do the insanity test, equal to the last one, but transporting only one vaccine.";
+SELECT "-- Let's just do the sanity test, equal to the last one, but transporting only one vaccine.";
 SELECT "-- Running INSERT INTO transportation(amount, from, to, vaccine_id) VALUES (1, 1, 18, 6); ...";
 INSERT INTO transportation(amount, "from", "to", vaccine_id) VALUES (1, 1, 18, 6);
 SELECT "-- If you don't see any error by now it is because it worked! :)";

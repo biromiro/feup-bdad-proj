@@ -21,7 +21,7 @@ WHERE infrastructure.id = 1 AND vaccine_id = 7;
 
 SELECT "";
 SELECT "-- Nothing was returned. Let's deliver some vaccines there.";
-SELECT "-- Runnning INSERT INTO delivery(distribution_centre_id, vaccine_id, amount) VALUES(1, 7, 1); ...";
+SELECT "-- Running INSERT INTO delivery(distribution_centre_id, vaccine_id, amount) VALUES(1, 7, 1); ...";
 INSERT INTO delivery(distribution_centre_id, vaccine_id, amount) VALUES(1, 7, 1);
 
 SELECT "";
