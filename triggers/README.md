@@ -7,6 +7,7 @@
 - [Trigger 3: Verify if there are enough vaccines in the origin infrastructure and if there is space in the destination infrastructure for a given transportation to occur](#trigger-3-verify-if-there-are-enough-vaccines-in-the-origin-infrastructure-and-if-there-is-space-in-the-destination-infrastructure-for-a-given-transportation-to-occur)
 - [Trigger 4: Verify if the destination storehouse of new transportation meet the temperature requirements of the vaccine that is transported](#trigger-4-verify-if-the-destination-storehouse-of-new-transportation-meet-the-temperature-requirements-of-the-vaccine-that-is-transported)
 - [Trigger 5: Verify if an inoculation number is in the range of the number of inoculations of a given vaccine](#trigger-5-verify-if-an-inoculation-number-is-in-the-range-of-the-number-of-inoculations-of-a-given-vaccine)
+- [Trigger 6: Keep the storage of an infrastructure updated according to the delivery associated with a distribution center](#trigger-6-keep-the-storage-of-an-infrastructure-updated-according-to-the-delivery-associated-with-a-distribution-center)
 
 ## Trigger 1: Prevent transportation from being held to a Distribution Centre
 
@@ -178,5 +179,32 @@ INSERT ON inoculation FOR EACH ROW
     )
     OR NEW.inoculation_number <= 0 BEGIN
 SELECT RAISE (ABORT, "The dose of the vaccine is invalid!");
+END;
+```
+
+## Trigger 6: Keep the storage of an infrastructure updated according to the delivery associated with a distribution center
+
+```sql
+DROP TRIGGER IF EXISTS delivery_vaccine_storage_trigger;
+CREATE TRIGGER delivery_vaccine_storage_trigger
+AFTER INSERT ON delivery
+FOR EACH ROW
+BEGIN
+
+    INSERT INTO vaccine_storage(infrastructure_id, vaccine_id, amount)
+    SELECT NEW.distribution_centre_id, NEW.vaccine_id, 0
+    WHERE NOT EXISTS (
+        SELECT * FROM vaccine_storage WHERE NEW.distribution_centre_id = vaccine_storage.infrastructure_id AND NEW.vaccine_id = vaccine_storage.vaccine_id
+    );
+
+    UPDATE vaccine_storage SET amount = amount + NEW.amount
+    WHERE
+        NEW.distribution_centre_id = vaccine_storage.infrastructure_id
+        AND NEW.vaccine_id = vaccine_storage.vaccine_id;
+
+    UPDATE infrastructure SET total_stored_vaccines = total_stored_vaccines + NEW.amount
+    WHERE
+        NEW.distribution_centre_id = infrastructure.id;
+
 END;
 ```

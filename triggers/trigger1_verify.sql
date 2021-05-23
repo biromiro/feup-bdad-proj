@@ -1,5 +1,6 @@
 PRAGMA foreign_keys = on;
-.mode box
+.mode column 
+.headers off
 
 SELECT "";
 SELECT "-------- Trigger 1 verification --------";
@@ -19,5 +20,9 @@ VALUES (1, 1, 3, 6);
 
 SELECT "";
 SELECT "-- Showing the last 2 transporations:";
+.mode box
+.headers on
 SELECT * FROM transportation ORDER BY id DESC LIMIT 2;
+.mode column
+.headers off 
 SELECT "-- There we can see the transportation from 1 to 3, but not the one from 1 to 2.";

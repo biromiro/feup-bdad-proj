@@ -7,11 +7,19 @@ WHERE vaccine.id NOT IN (
         FROM vaccine
             CROSS JOIN storehouse
         WHERE (
-                vaccine.minimum_temperature >= storehouse.minimum_temperature
-                AND vaccine.minimum_temperature <= storehouse.maximum_temperature
-            )
-            OR (
-                vaccine.maximum_temperature >= storehouse.minimum_temperature
-                AND vaccine.maximum_temperature <= storehouse.maximum_temperature
-            )
+                    storehouse.minimum_temperature <= vaccine.minimum_temperature
+                    AND storehouse.maximum_temperature >= vaccine.minimum_temperature
+                )
+                OR (
+                    storehouse.minimum_temperature <= vaccine.maximum_temperature
+                    AND storehouse.maximum_temperature >= vaccine.maximum_temperature
+                )
+                OR (
+                    storehouse.minimum_temperature <= vaccine.maximum_temperature
+                    AND storehouse.maximum_temperature IS NULL
+                )
+                OR (
+                    storehouse.maximum_temperature >= vaccine.minimum_temperature
+                    AND storehouse.minimum_temperature IS NULL
+                )
     );
