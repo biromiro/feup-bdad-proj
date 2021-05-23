@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 DROP view IF EXISTS citizen_vaccine_numbers;
 CREATE view citizen_vaccine_numbers AS
 SELECT inoculation.citizen_id,

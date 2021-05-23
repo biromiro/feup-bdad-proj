@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 DROP VIEW IF EXISTS patients;
 CREATE VIEW patients AS
 SELECT citizen_has_pathology.citizen_id

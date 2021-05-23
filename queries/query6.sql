@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT MAX(rate) as rate,
     common_name as disease
 FROM (

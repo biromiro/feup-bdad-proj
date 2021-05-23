@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT *
 FROM vaccine
 WHERE vaccine.id NOT IN (

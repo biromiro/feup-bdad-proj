@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 DROP VIEW IF EXISTS vaccines;
 CREATE VIEW vaccines AS
 SELECT vaccine.id

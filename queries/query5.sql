@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT vaccine.id AS vaccine_id,
     vaccine.name AS vaccine_name,
     vaccine.inoculations_number AS vaccine_total_inoculations,

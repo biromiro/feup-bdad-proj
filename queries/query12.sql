@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT county_name,
     (
         CASE

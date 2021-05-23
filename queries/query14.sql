@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT pathology.id, pathology.common_name,
     IFNULL((
         COUNT(*) / (julianday(MAX(date)) - julianday(MIN(date)))

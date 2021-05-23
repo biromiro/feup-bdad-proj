@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT ((age_group * 10) || '-' || (9 + age_group * 10)) AS age_group,
     people_count
 FROM (

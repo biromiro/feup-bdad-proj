@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 DROP VIEW IF EXISTS counties_with_covid_inoculated;
 CREATE VIEW counties_with_covid_inoculated AS
 SELECT COUNT(
@@ -60,6 +64,6 @@ FROM (
     ) AS county_population ON county_population.county_id = inoculations_per_county.county_id;
     
 SELECT county_name,
-    IFNULL(CAST(completely_vaccinated_num AS REAL) * 100 / population, 0) AS percentage
+    IFNULL(CAST(completely_vaccinated_num AS REAL) * 100 / population, CAST(0 AS REAL)) AS percentage
 FROM covid_vaccination_per_county
 ORDER BY percentage DESC;

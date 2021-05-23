@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT citizen.citizen_card_number,
     citizen.name
 FROM vaccination_group

@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 DROP VIEW IF EXISTS districts_with_capacity;
 CREATE VIEW districts_with_capacity AS
 SELECT SUM(maximum_capacity) AS capacity,

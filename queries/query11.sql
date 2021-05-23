@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 WITH citizens AS (
         SELECT CAST(COUNT(*) AS real) AS amount
         FROM citizen),

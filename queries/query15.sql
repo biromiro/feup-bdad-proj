@@ -1,3 +1,7 @@
+.headers on
+.mode column
+.nullvalue NULL
+
 SELECT COUNT(*) as number_of_inoculations,
     date
 FROM inoculation
