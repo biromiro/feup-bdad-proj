@@ -260,7 +260,7 @@ FROM (
                 SELECT county_id
                 from counties_with_covid_inoculated
             )
-    ) AS T
+    ) AS inoculations_per_county
     LEFT JOIN (
         SELECT COUNT(*) as population,
             county.id as county_id
@@ -269,14 +269,15 @@ FROM (
             JOIN address ON zip_code.id = address.zip_code_id
             JOIN citizen ON address.id = citizen.address_id
         GROUP BY county.id
-    ) AS S ON T.county_id = S.county_id;
-    
+    ) AS county_population ON county_population.county_id = inoculations_per_county.county_id;
+
 SELECT county_name,
     IFNULL(CAST(completely_vaccinated_num AS REAL) * 100 / population, 0) AS percentage
-FROM covid_vaccination_per_county;
+FROM covid_vaccination_per_county
+ORDER BY percentage DESC;
 ```
 
-## Query 11: What is the incidence per 100k of infection of a given disease (in this case, COVID-19)?  
+## Query 11: What is the incidence per 100k of infection of a given disease (in this case, COVID-19)?
 
 ```sql
 WITH citizens AS (
@@ -291,7 +292,7 @@ SELECT covid.infected * 100000 / citizens.amount AS covid_infected_per_100k
 FROM citizens, covid;
 ```
 
-## Query 12: What is the incidence per 100k per county of infection of a given disease (in this case, COVID-19)?  
+## Query 12: What is the incidence per 100k per county of infection of a given disease (in this case, COVID-19)?
 
 ```sql
 SELECT county_name,
@@ -371,6 +372,7 @@ WHERE pathology.id = 56
 ## Query 16: What is the capacity per capita to hold vaccines in each district?
 
 ```sql
+DROP VIEW IF EXISTS districts_with_capacity;
 CREATE VIEW districts_with_capacity AS
 SELECT SUM(maximum_capacity) AS capacity,
     district.id AS district_id,
@@ -417,7 +419,7 @@ FROM (
                         SELECT district_id
                         FROM districts_with_capacity
                     )
-            ) AS T
+            ) AS capacity_per_district
             LEFT JOIN (
                 SELECT COUNT(*) AS population,
                     district.id AS district_id
@@ -427,8 +429,9 @@ FROM (
                     JOIN address ON zip_code.id = address.zip_code_id
                     JOIN citizen ON address.id = citizen.address_id
                 GROUP BY district_id
-            ) AS S ON T.district_id = S.district_id
-    );
+            ) AS population_per_district ON capacity_per_district.district_id = population_per_district.district_id
+    )
+ORDER BY district_name ASC;
 ```
 
 ## Query 17: What are the pathologies that have no vaccine?

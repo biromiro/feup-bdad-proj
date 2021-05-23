@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS districts_with_capacity;
 CREATE VIEW districts_with_capacity AS
 SELECT SUM(maximum_capacity) AS capacity,
     district.id AS district_id,
@@ -44,7 +45,7 @@ FROM (
                         SELECT district_id
                         FROM districts_with_capacity
                     )
-            ) AS T
+            ) AS capacity_per_district
             LEFT JOIN (
                 SELECT COUNT(*) AS population,
                     district.id AS district_id
@@ -54,5 +55,6 @@ FROM (
                     JOIN address ON zip_code.id = address.zip_code_id
                     JOIN citizen ON address.id = citizen.address_id
                 GROUP BY district_id
-            ) AS S ON T.district_id = S.district_id
-    );
+            ) AS population_per_district ON capacity_per_district.district_id = population_per_district.district_id
+    )
+ORDER BY district_name ASC;

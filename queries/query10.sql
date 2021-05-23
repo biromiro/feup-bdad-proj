@@ -48,7 +48,7 @@ FROM (
                 SELECT county_id
                 from counties_with_covid_inoculated
             )
-    ) AS T
+    ) AS inoculations_per_county
     LEFT JOIN (
         SELECT COUNT(*) as population,
             county.id as county_id
@@ -57,8 +57,9 @@ FROM (
             JOIN address ON zip_code.id = address.zip_code_id
             JOIN citizen ON address.id = citizen.address_id
         GROUP BY county.id
-    ) AS S ON T.county_id = S.county_id;
+    ) AS county_population ON county_population.county_id = inoculations_per_county.county_id;
     
 SELECT county_name,
     IFNULL(CAST(completely_vaccinated_num AS REAL) * 100 / population, 0) AS percentage
-FROM covid_vaccination_per_county;
+FROM covid_vaccination_per_county
+ORDER BY percentage DESC;
