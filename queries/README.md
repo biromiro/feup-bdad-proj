@@ -5,7 +5,7 @@
 - [Query 1: Who are the citizens that belong to a given vaccination group?](#query-1-who-are-the-citizens-that-belong-to-a-given-vaccination-group)
 - [Query 2: What is the most common pathology?](#query-2-what-is-the-most-common-pathology)
 - [Query 3: What is the percentage of citizens that took at least one dose and are fully dosed for all pathologies?](#query-3-what-is-the-percentage-of-citizens-that-took-at-least-one-dose-and-are-fully-dosed-for-all-pathologies)
-- [Query 4: How much doses are administrated for a given pathology?](#query-4-how-much-doses-are-administrated-for-a-given-pathology)
+- [Query 4: How many doses are administrated for a given pathology?](#query-4-how-many-doses-are-administrated-for-a-given-pathology)
 - [Query 5: How many doses of a given vaccine were administrated to a given citizen, and how many are left?](#query-5-how-many-doses-of-a-given-vaccine-were-administrated-to-a-given-citizen-and-how-many-are-left)
 - [Query 6: What is the disease with the highest vaccination rate?](#query-6-what-is-the-disease-with-the-highest-vaccination-rate)
 - [Query 7: How many vaccines does a pathology have?](#query-7-how-many-vaccines-does-a-pathology-have)
@@ -119,7 +119,7 @@ FROM pathology
     citizens;
 ```
 
-## Query 4: How much doses are administrated for a given pathology?
+## Query 4: How many doses are administrated for a given pathology?
 
 ```sql
 SELECT pathology.scientific_name,
