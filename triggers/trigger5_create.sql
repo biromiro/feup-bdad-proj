@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = on;
+
 DROP TRIGGER IF EXISTS check_validity_vaccine_dose;
 CREATE TRIGGER check_validity_vaccine_dose BEFORE
 INSERT ON inoculation FOR EACH ROW

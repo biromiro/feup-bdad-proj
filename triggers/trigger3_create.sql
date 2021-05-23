@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = on;
+
 DROP TRIGGER IF EXISTS vaccine_transportation_amount_check_trigger;
 CREATE TRIGGER vaccine_transportation_amount_check_trigger BEFORE
 INSERT ON transportation FOR EACH ROW BEGIN

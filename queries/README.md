@@ -10,7 +10,7 @@
 - [Query 6: What is the disease with the highest vaccination rate?](#query-6-what-is-the-disease-with-the-highest-vaccination-rate)
 - [Query 7: How many vaccines does a pathology have?](#query-7-how-many-vaccines-does-a-pathology-have)
 - [Query 8: What are the vaccines for a pathology?](#query-8-what-are-the-vaccines-for-a-pathology)
-- [Query 9: What are the storehouses above 90% of its capacity?](#query-9-what-are-the-storehouses-above-90-of-its-capacity)
+- [Query 9: What are the storehouses above 50% of its capacity?](#query-9-what-are-the-storehouses-above-50-of-its-capacity)
 - [Query 10: What is the percentage of people per county that are vaccinated for a given disease (in this case, COVID-19)?](#query-10-what-is-the-percentage-of-people-per-county-that-are-vaccinated-for-a-given-disease-in-this-case-covid-19)
 - [Query 11: What is the incidence per 100k of infection of a given disease (in this case, COVID-19)?](#query-11-what-is-the-incidence-per-100k-of-infection-of-a-given-disease-in-this-case-covid-19)
 - [Query 12: What is the incidence per 100k per county of infection of a given disease (in this case, COVID-19)?](#query-12-what-is-the-incidence-per-100k-per-county-of-infection-of-a-given-disease-in-this-case-covid-19)
@@ -22,7 +22,6 @@
 - [Query 18: Which vaccines do not have a storehouse that could hold it (according to temperature restrictions)?](#query-18-which-vaccines-do-not-have-a-storehouse-that-could-hold-it-according-to-temperature-restrictions)
 - [Query 19: What is the number of citizens by age group?](#query-19-what-is-the-number-of-citizens-by-age-group)
 - [Query 20: What is the percentage of citizens vaccinated with at least one inoculation for a pathology by age group?](#query-20-what-is-the-percentage-of-citizens-vaccinated-with-at-least-one-inoculation-for-a-pathology-by-age-group)
-- [Query 21: What is the number of vaccines for each infrastructure?](#query-21-what-is-the-number-of-vaccines-for-each-infrastructure)
 
 ## Query 1: Who are the citizens that belong to a given vaccination group?
 
@@ -545,20 +544,4 @@ FROM (
 SELECT ((age_group * 10) || '-' || (9 + age_group * 10)) AS age_group,
     (100.0 * vaccinated_people / people_count) || '%' AS percentage
 FROM vaccination_by_age_group;
-```
-
-## Query 21: What is the number of vaccines for each infrastructure?
-
-```sql
-SELECT vaccine.id,
-    vaccine.name,
-    IFNULL(storage.amount, 0) AS amount
-FROM vaccine
-    LEFT JOIN (
-        SELECT *
-        FROM vaccine_storage
-        WHERE infrastructure_id = 48
-    ) AS storage ON storage.vaccine_id = vaccine.id
-    LEFT JOIN infrastructure ON infrastructure.id = storage.infrastructure_id
-ORDER BY vaccine.id;
 ```
