@@ -1,6 +1,4 @@
-SELECT vaccine.name,
-    vaccine.minimum_temperature,
-    vaccine.maximum_temperature
+SELECT *
 FROM vaccine
 WHERE vaccine.id NOT IN (
         SELECT vaccine.id

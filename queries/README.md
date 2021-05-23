@@ -193,7 +193,7 @@ FROM pathology
     JOIN vaccine ON vaccine.prevents_pathology_id = pathology.id;
 ```
 
-## Query 9: What are the storehouses above 90% of its capacity?
+## Query 9: What are the storehouses above 50% of its capacity?
 
 ```sql
 SELECT id,
@@ -203,8 +203,8 @@ SELECT id,
         total_stored_vaccines / CAST(maximum_capacity AS real) * 100
     ) || '%' AS capacity
 FROM storehouse
-    JOIN infrastructure ON infrastructure.id = storehouse.infrastructure_id
-WHERE total_stored_vaccines / CAST(maximum_capacity AS real) >= 0.9;
+    JOIN infrastructure ON infrastructure.id = storehouse.infrastructure_id;
+WHERE total_stored_vaccines / CAST(maximum_capacity AS real) >= 0.5;
 ```
 
 ## Query 10: What is the percentage of people per county that are vaccinated for a given disease (in this case, COVID-19)?
